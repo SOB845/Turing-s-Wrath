@@ -1,7 +1,7 @@
 import random
 from random import SystemRandom
+from pwned import lookup_pwned_api
 import string
-import time as t
 import sys
 
 def randSalt(length=5):
@@ -16,10 +16,8 @@ def random_password(length):
 	# 10 digits,
 	# 15 symbols,
 	# In total 7800 random possible characters
-
-	chars = string.ascii_letters + string.digits + '!@#$%^7&*()<>;:'
+	symbols = '!@#$%^7&*()<>;:'
+	chars = string.ascii_letters + string.digits + symbols
 	p = ''.join(random.SystemRandom().choice(chars) for i in range(length))
 
 	return p
-
-print(random_password(10))
