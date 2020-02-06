@@ -11,7 +11,16 @@ except ModuleNotFoundError:
 intro = "Welcome to S.H.A.R.P.E.N Password Generator. \nMove the slider to declare password length:"
 
 def onClick():
+	
+	## Gets the value from slider and generates a password of that length.
+	## If the value is less than 6, generates the password alongside a warning.
+	
 	leng = sld.get()
+	
+	if leng <= 6:
+		warn = Label(root, text=">> For more secure passwords, make sure that length is greater than 6", bg="red", fg="white") 
+		warn.pack()
+		
 	rand = randPass(leng)
 	passw = Label(root, text=">> Here is your random password: \n"+ rand, bg="black", fg="white")
 	passw.pack()
@@ -31,7 +40,7 @@ root.title("S.H.A.R.P.E.N Password Generator")
 intr = Label(root, text=intro, font="Helvetica")
 intr.pack()
 
-# Builds a simple slider for getting length of password
+# Builds a simple slider for getting the length of password
 sld = Scale(root, from_=1, to=100, length=600, orient=HORIZONTAL)
 sld.pack()
 
@@ -45,4 +54,4 @@ quit = Button(root, text="QUIT", width=6, height=2, command=root.quit)
 quit.pack()
 
 root.geometry("600x600")
-root.mainloop()	# to keep program running
+root.mainloop()	# Used to keep program running
