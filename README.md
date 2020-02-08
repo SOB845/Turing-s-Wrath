@@ -23,7 +23,7 @@ Every time you copy a piece of text, your computer saves it on a memory block, t
 \
 The answers lies is in discrete mathematics. SHARPEN random passwords are constructed by permutation of 87 characters: 26 lower case + 26 upper case + 25 symbols + 10 digits. Let's assume that you want to generate a password of length 3, here is a visualizations of the problem:
 ![87cubed](https://user-images.githubusercontent.com/39483396/73982598-c7b21b00-4949-11ea-9c97-fbd5ac4942a0.png)
-Multiplication law describes that if you want to arrange n things in m possible way while repetition is allowed, there are _n^m_ ways to do so. Thus there will be 87^3 = 658,503 possible permutations for a password of length 3. If a brute force attack guesses 1 permutation in 1 second, it will take 658,503 seconds untill it finds the correct permutation. 
+Multiplication principle of combinatorics states that if you want to arrange n things in m possible way while repetition is allowed, there are _n^m_ ways to do so. Thus there will be 87^3 = 658,503 possible permutations for a password of length 3. If a brute force attack guesses 1 permutation in 1 second, it will take 658,503 seconds untill it finds the correct permutation. 
 \
 However, the number of permutations grow exponentially with length. Let's see how many possible permutations are there for a length = 4:
 ![87quadred](https://user-images.githubusercontent.com/39483396/73984259-8885c900-494d-11ea-945b-70dc3b612574.png)
