@@ -11,7 +11,7 @@ CLI version is suitable for users experienced with Unix-Linux based system and I
 GUI on the other hand, is built for everyday use cases.
 
 ### What does it mean for a password to be "pwned"?
-It means that the password has been compromised in a data breach; aka it's not safe at all. Here is the definition of *pwned* for boomers: https://www.urbandictionary.com/define.php?term=pwned
+It means that the password has been compromised in a data breach; aka it's not safe at all. See [Definition of Pwned](https://www.urbandictionary.com/define.php?term=pwned)
 
 SHARPEN uses pwnedpasswords's lookup_pwned_api to verify that the generated password has not been pwend before. If a specific password turns out to be pwned, the program throws an error and terminates the running process.
 
