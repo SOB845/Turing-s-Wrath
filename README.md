@@ -1,4 +1,4 @@
-# Turing's Wrath
+# Turing's Wrath: the password generator
 With the daily rise of the Web 2.0, we find ourselves in need of new user accounts and more secure passwords. However, keeping these accounts information is always a pain in the ass. You might want to write your account information on a paper (which is way better than digital storages) but that's not the only problem. **How do you make sure your password is as strong as possible?** if you're not sure, then it doesn't matter how you keep it safe. Your password is the heart of your web immunity and **Turing's Wrath** is build to protect it.
 
 # FAQs
