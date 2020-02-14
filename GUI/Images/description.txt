@@ -1,0 +1,2 @@
+This folder contains all images\icons use in the GUI app.
+Under GNU license, user may change this as they desire.
