@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 
 intro = "Welcome to Turing's Wrath: Password Generator. \nMove the slider to choose password length:"
 
-def onClick():
+def Generate():
 	
 	## Gets the value from slider and generates a password of that length.
 	## If the value is less than 6, generates the password alongside a warning.
@@ -21,6 +21,9 @@ def onClick():
 		warn.pack()	
 	rand = randPass(leng)
 	textfield.insert(INSERT,">>Your password is: \n" + rand + '\n\n')
+
+def Clear():
+	textfield.delete(1.0,END)	
 
 def Donations():
 	textfield.insert(INSERT, ">> My Ethereum address: \n0xaA845d9D5C588Ee6E63D55544faf15466fc7DEA6" + '\n\n')
@@ -60,6 +63,10 @@ quit.pack(padx=20, pady=10, ipadx=5, ipady=2)
 # Textfield in which the passwords and other command results are shown
 textfield = Text(root, width=60, height=15, yscrollcommand = scrollbar.set, bd=3, wrap=WORD)
 textfield.pack()
+
+# Button to delete everything in text field
+clrText = Button(root, text="Clear Everything", width=12, height=2, bg="red", command=Clear)
+clrText.pack(padx= 20, pady=5, ipadx=5, ipady=2)
 
 
 root.iconbitmap('image files/AlanTuring(32x32).ico')
