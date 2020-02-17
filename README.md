@@ -15,9 +15,6 @@ It means that the password has been compromised in a data breach; aka it's not s
 
 **Turing's Wrath** uses pwnedpasswords's lookup_pwned_api to verify that the generated password has not been pwend before. If a specific password turns out to be pwned, the program throws an error and terminates the running process.
 
-### Why can't I copy and paste the generated passwords in GUI version?
-Every time you copy a piece of text, your computer saves it on a memory block, this has its own risks and vulnerabilities. The desktop application is designed that way to prevent any malicious attacks targeting random access memory.
-
 ### Why should my password length be more than 6 characters?
 ***TL;DR**: It's much safer this way
 \
