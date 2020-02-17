@@ -3,6 +3,9 @@
 
 import hashlib
 import sys
+import urllib
+import requests
+
 
 try:
     import requests
