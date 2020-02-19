@@ -42,6 +42,3 @@ def lookup_pwned_api(pwd):
 
     else:
         print("Password is safe to use.")
-
-
-    return sha1pwd, count
