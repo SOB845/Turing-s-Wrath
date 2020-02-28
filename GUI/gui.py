@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox
 from RandPwd import randPass
+from pwned import lookup_pwned_api
+
 
 try:
 	from tkinter import *
@@ -17,16 +20,31 @@ def Generate():
 	
 	leng = sld.get()
 	if leng <= 6:
-		warn = Label(root, text=">> For more secure passwords, make sure that length is greater than 6", bg="red", fg="white") 
-		warn.pack()	
+		messagebox.showwarning("Warning!", "For better password security, the length should be greater than 6.")
 	rand = randPass(leng)
 	textfield.insert(INSERT,">>Your password is: \n" + rand + '\n\n')
 
+
+def checkPwnage():
+	checkWin = tk.Toplevel(root)
+	txt = Label(checkWin, text="Type in the password to check if it's pwned.")
+	txt.pack()
+	ent = Entry(checkWin,show="*")
+	ent.pack()
+	passw = ent.get()
+	go = Button(checkWin, text="Search", command=lookup_pwned_api(passw))
+	go.pack(padx=10, pady=5,ipadx=5, ipady=2)
+	checkWin.geometry("250x200")
+	
+	
 def Clear():
 	textfield.delete(1.0,END)	
 
-def Donations():
-	textfield.insert(INSERT, ">> My Ethereum address: \n0xaA845d9D5C588Ee6E63D55544faf15466fc7DEA6" + '\n\n')
+def Quit():
+	ex = messagebox.askyesno("Quit?","Are you sure you want to exit the program?")
+	print(ex)
+	if ex:
+		root.quit()
 
 
 # Progam starts here
@@ -48,15 +66,15 @@ intr.pack()
 sld = Scale(root, from_=1, to=100, length=600, orient=HORIZONTAL)
 sld.pack()
 
-
 # Buttons
 Generator = Button(root, text="Generate password", height=2, command=onClick)
 Generator.pack(padx=20, pady=5, ipadx= 5, ipady= 2)
 
-Donate = Button(root, text="Felt useful? Donate now!", height=2, command=Donations)
-Donate.pack(padx=20, pady=5, ipadx=5, ipady=2)
+# Call lookup_pwned_api to see if entered password is safe.
+CheckPwnage = Button(root, height=2, text="Check if pwned", command=checkPwnage)
+CheckPwnage.pack(padx=20, pady=10, ipadx=5, ipady=2)
 
-quit = Button(root, text="QUIT", width=6, height=2, command=root.quit)
+quit = Button(root, text="QUIT", width=6, height=2, command= Quit)
 quit.pack(padx=20, pady=10, ipadx=5, ipady=2)
 
 
@@ -69,6 +87,6 @@ clrText = Button(root, text="Clear Everything", width=12, height=2, bg="red", co
 clrText.pack(padx= 20, pady=5, ipadx=5, ipady=2)
 
 
-root.iconbitmap('image files/AlanTuring(32x32).ico')
+root.iconbitmap('image files/AlanTuring(64x64).ico')
 root.geometry("700x600")
 root.mainloop()	# Used to keep program running
