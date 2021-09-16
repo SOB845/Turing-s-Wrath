@@ -1,19 +1,32 @@
 import random
 from random import SystemRandom
-from pwned import lookup_pwned_api
 import string
 import sys
 
-def randSalt(length = 5):
-	letters = string.ascii_letters + string.digits
-	r = ''.join(random.SystemRandom().choice(letters) for i in range(length))
 
-	return r
-
-
-def randPass(length):
-	symbols = '~`!@#$%^&*()[]<>;:.?/-_+='
+def Secure_randPass(length):
+	symbols = '`~!@#$%^&*()-=_+[]}{|\/;,.<>?'
 	chars = string.ascii_letters + string.digits + symbols
 	p = ''.join(random.SystemRandom().choice(chars) for i in range(length))
-	lookup_pwned_api(p)
+	return p
+
+def randPass_without_digits_and_symbols(length):
+	chars = string.ascii_letters
+	password = ""
+	while len(password) < length:
+		password += random.SystemRandom().choice(chars)
+	return password
+
+def randPass_without_digits(length):
+	symbols = '`~!@#$%^&*()-=_+[]}{|\/;,.<>?'
+	chars = string.ascii_letters+symbols
+	p = ""
+	while len(p) < length:
+		p += random.SystemRandom().choice(chars)
+	return p
+
+def randPass_without_symbols(length):
+	chars = string.ascii_letters + string.digits
+	p = ''.join(random.SystemRandom().choice(chars) for i in range(length))
+
 	return p
