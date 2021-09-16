@@ -1,9 +1,8 @@
-# Orginal code written by Mike Pound and contributors
-# Github: https://github.com/mikepound/pwned-search/blob/master/pwned.py
+## Orginal code written by Mike Pound and contributors
+## Github: https://github.com/mikepound/pwned-search/blob/master/pwned.py
 
 import hashlib
 import sys
-import urllib
 import requests
 
 
@@ -34,17 +33,8 @@ def lookup_pwned_api(pwd):
     url = 'https://api.pwnedpasswords.com/range/' + head
     res = requests.get(url)
     if not res.ok:
-        raise RuntimeError('Error fetching "{}": {}'.format(
-            url, res.status_code))
+        raise RuntimeError('Error fetching "{}": {}'.format(url, res.status_code))
     hashes = (line.split(':') for line in res.text.splitlines())
     count = next((int(count) for t, count in hashes if t == tail), 0)
 
-    if count > 0:
-        foundmsg = "{} was found with {} occurrences. It's not safe at all!"
-        print(foundmsg.format(pwd,count))
-
-    else:
-        print("{} was not found".format(pwd))
-
-
-    return sha1pwd, count
+    return count
