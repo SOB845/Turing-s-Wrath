@@ -39,7 +39,7 @@ def Destroy_CheckPwnageWindow():
 
 def call_lookup_api():
 	entered_password = GetTxt.get()
-	lookup_entered_password = lookup_pwned_api(message)
+	lookup_entered_password = lookup_pwned_api(entered_password)
 	if entered_password == "":
 		Label(checkWin, text="Please type something").pack()
 	elif lookup_entered_password > 0:
@@ -52,7 +52,7 @@ def CheckPwnageWindow():
 	checkWin = Toplevel(root)
 	checkWin.title("Check pwnage")
 	Label(checkWin, text="Enter your password to see if it's been pwned (Requires internet connection)").pack()
-	Entry(checkWin, textvariable=Txt2Data, width=30,bd=2).pack()
+	Entry(checkWin, textvariable=GetTxt, width=30,bd=2).pack()
 	Button(checkWin, height=2, width= 7, text="SEARCH", command=call_lookup_api).pack(padx=1, pady=10, ipadx=5, ipady=1)
 	Button(checkWin, height=2, width=7, text="BACK", command=Destroy_CheckPwnageWindow).pack(padx=1, pady=10, ipadx=5, ipady=1)
 	checkWin.geometry("440x220")
