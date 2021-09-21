@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
-from RandPwd import *
+from randpass_generator import *
 from pwned import lookup_pwned_api
+from string import ascii_letters, digits, punctuation
+
 
 try:
 	from tkinter import *
@@ -23,13 +25,13 @@ def Generate():
 		if leng <= 6:
 			messagebox.showwarning("Warning!", "For higher password security, the length should be greater than 6.")
 		elif NUMS.get()==1 and SYMBS.get()==1:
-			textfield.insert(INSERT,">> " + randPass_without_digits_and_symbols(leng)+'\n')
+			textfield.insert(INSERT,">> " + xclude_digits_and_symbols(leng)+'\n')
 		elif NUMS.get() == 1:
-			textfield.insert(INSERT, ">> " + randPass_without_digits(leng) +'\n')
+			textfield.insert(INSERT, ">> " + xclude_digits(leng) +'\n')
 		elif SYMBS.get() == 1:
-			textfield.insert(INSERT, ">> " + randPass_without_symbols(leng) + '\n')
+			textfield.insert(INSERT, ">> " + xclude_symbols(leng) + '\n')
 		else:
-			textfield.insert(INSERT,">> " + Secure_randPass(leng) + '\n')
+			textfield.insert(INSERT,">> " + Generator(ascii_letters,digits,punctuation,leng) + '\n')
 		i += 1
 	textfield.config(state="disabled")
 
@@ -97,8 +99,8 @@ exclude_symbols = Checkbutton(root, text="EXCLUDE SYMBOLS FROM PASSWORD", variab
 exclude_symbols.pack(side=TOP)
 
 ### Buttons
-Generator = Button(root, text="GENERATE PASSWORD", height=2, command=Generate)
-Generator.pack(padx=20, pady=5, ipadx= 5, ipady = 2)
+Generator_Button = Button(root, text="GENERATE PASSWORD", height=2, command=Generate)
+Generator_Button.pack(padx=20, pady=5, ipadx= 5, ipady = 2)
 CheckPwnage = Button(root, height=2, text="CHECK IF PWNED", command=CheckPwnageWindow)
 CheckPwnage.pack(padx=20, pady=10, ipadx=5, ipady=2)
 quit = Button(root, text="QUIT", width=6, height=2, command=Quit)
