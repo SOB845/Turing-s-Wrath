@@ -10,16 +10,3 @@ def save_password(user_service,user_password):
     connection.commit()
     connection.close()
     return None
-
-def find_password(Service_Name):
-    connection = sqlite3.connect('userinfo.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT service,password,date_added FROM user_data WHERE service = (?)",(Service_Name,))
-    connection.commit()
-    res = cursor.fetchall()
-    for row in res:
-        print("Service: "+row[0]),
-        print("Password: "+row[1]),
-        print("Time added: "+row[2])
-    connection.close()
-    return res
