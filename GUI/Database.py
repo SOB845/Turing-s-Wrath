@@ -1,5 +1,5 @@
 import sqlite3
-from sqlite import *
+from sqlite3 import *
 import datetime
 
 def save_password(user_service,user_password):
