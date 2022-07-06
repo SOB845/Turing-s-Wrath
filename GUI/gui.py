@@ -58,19 +58,25 @@ def CheckPwnageWindow():
 	Button(checkWin, height=2, width=7, text="BACK", command=Destroy_CheckPwnageWindow).pack(padx=1, pady=10, ipadx=5, ipady=1)
 	checkWin.geometry("500x220")
 	checkWin.iconbitmap('AlanTuring(64x64).ico')
-
-def save_to_database():	#Saves service and its password in the database
-	d1 = Service_Saver.get()
-	d2 = Password_Saver.get()
-	save_password(d1,d2)
-	messagebox.showinfo("Info","Password is saved!")
-	savewin.destroy()
+	
+def save_to_database():
+	#Saves service name, username and password in the database
+	#'e' standds for entry
+	e1 = Service_Saver.get() # Service name
+	e2 = Username_Saver.get() # Username
+	e3 = Password_Saver.get() # Password
+	if len(e1) or len(e3) == 0:
+		messagebox.showerror("Error","Service and Password fields cannot be empty!")
+	else:
+		save_password(e1,e2,e3)
+		messagebox.showinfo("Info","Password is saved!")
+		savewin.destroy()
 
 def find_password(Service_Name): #Connects to the database and looks for info for given Service name
     global res
     connection = sqlite3.connect('userinfo.db')
     cursor = connection.cursor()
-    cursor.execute("SELECT service,password,date_added FROM user_data WHERE service = (?)",(Service_Name,))
+    cursor.execute("SELECT service,username,password,date_added FROM user_data WHERE service = (?)",(Service_Name,))
     connection.commit()
     res = cursor.fetchall()
     connection.close()
@@ -92,11 +98,13 @@ def SaveWindow():
 	Label(savewin, text="Type the password and its associated service\n",font=('Ariel',12)).grid(row=0, column=1)
 	Label(savewin,text="Service/App:").grid(row=1, column=0,ipady=10)
 	Entry(savewin,width=35,bd=2, textvariable=Service_Saver).grid(row=1,column=1)
-	Label(savewin, text="Password:").grid(row=2,column=0)
-	Entry(savewin,width=35,bd=2, textvariable=Password_Saver).grid(row=2,column=1)
-	Button(savewin, text="SAVE",height=2, width=7, command=save_to_database).grid(row=3, column=1,padx=1, pady=18, ipadx=5, ipady=1)
+	Label(savewin, text="Username/Email:").grid(row=2,column=0,ipady=10)
+	Entry(savewin,width=35,bd=2, textvariable=Username_Saver).grid(row=2,column=1)
+	Label(savewin, text="Password:").grid(row=3,column=0,ipady=10)
+	Entry(savewin,width=35,bd=2, textvariable=Password_Saver).grid(row=3,column=1)
+	Button(savewin, text="SAVE",height=2, width=7, command=save_to_database).grid(row=4, column=1,padx=1, pady=18, ipadx=5, ipady=1)
 	savewin.title("Save password")
-	savewin.geometry("440x220")
+	savewin.geometry("470x235")
 	savewin.iconbitmap('AlanTuring(64x64).ico')
 
 def SearchWindow():
@@ -141,6 +149,7 @@ NUMS = BooleanVar()	#Stores Boolean data for exclude_digits checkbox
 SYMBS = BooleanVar() #Stores Boolean data for exclude_symbols checkbox
 GetTxt = StringVar() #Stores entry data for call_lookup_api function
 Service_Saver = StringVar()	#Stores entry data for SaveWindow
+Username_Saver = StringVar() #Stores entry data for SaveWindow
 Password_Saver = StringVar() #Stores entry data for SaveWindow
 Search_Service_Saver = StringVar() #Stores entry data for SearchWindow
 
