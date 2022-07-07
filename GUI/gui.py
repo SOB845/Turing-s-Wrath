@@ -65,7 +65,7 @@ def save_to_database():
 	e1 = Service_Saver.get() # Service name
 	e2 = Username_Saver.get() # Username
 	e3 = Password_Saver.get() # Password
-	if len(e1) or len(e3) == 0:
+	if len(e1) == 0 or len(e3) == 0:
 		messagebox.showerror("Error","Service and Password fields cannot be empty!")
 	else:
 		save_password(e1,e2,e3)
