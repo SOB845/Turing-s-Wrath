@@ -27,4 +27,4 @@ Thus for the minimum length (6), number of possible permutations will be 531,441
 As of V1.0.0 users are able to store their passwords in a database. Press `SAVE PASSWORD` button in the main app and enter name of the service and its password you want to save. This information will be stored in a local database. Please note that we have not yet developed an encryption system for the database, so the .db file must be encrypted manually by the users.
 
 ### Do you accept donations?
-With pleasure!!! Since I regularly change my crypto wallet adresses, users willing to tip may send me an email so I can provide them the latest addresses.
+With pleasure!!! Since I regularly change my crypto wallet adresses, users willing to tip may send me an email (sobhan464@gmail.com) so I can provide them the latest addresses.
