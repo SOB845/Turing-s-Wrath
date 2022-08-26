@@ -34,7 +34,6 @@ def Generate():
 		i += 1
 	textfield.config(state="disabled")
 
-
 def Destroy_CheckPwnageWindow():
 	checkWin.destroy()
 
@@ -58,7 +57,7 @@ def CheckPwnageWindow():
 	Button(checkWin, height=2, width=7, text="BACK", command=Destroy_CheckPwnageWindow).pack(padx=1, pady=10, ipadx=5, ipady=1)
 	checkWin.geometry("500x220")
 	checkWin.iconbitmap('AlanTuring(64x64).ico')
-	
+
 def save_to_database():
 	#Saves service name, username and password in the database
 	#'e' standds for entry
@@ -72,13 +71,13 @@ def save_to_database():
 		messagebox.showinfo("Info","Password is saved!")
 		savewin.destroy()
 
-def find_password(Service_Name): #Connects to the database and looks for info for given Service name
+def find_password(Service_Name): #Connects to the database and looks for info for a given Service name
     global res
-    connection = sqlite3.connect('userinfo.db')
+    connection = sqlite3.connect(r"C:\Users\Windows\turinginfo.db")
     cursor = connection.cursor()
-    cursor.execute("SELECT service,username,password,date_added FROM user_data WHERE service = (?)",(Service_Name,))
+    cursor.execute("SELECT * FROM user_data WHERE service = (?)",(Service_Name,))
     connection.commit()
-    res = cursor.fetchall()
+    res = str(cursor.fetchall())
     connection.close()
 
 
@@ -86,8 +85,8 @@ def lookup_service():	#Search the database for a password
 	textfield.config(state="normal")
 	l = Search_Service_Saver.get()
 	find_password(l)
-	textfield.insert(INSERT, ">>"+"\n")
-	textfield.insert(INSERT, res)
+	textfield.insert(INSERT, "\n")
+	textfield.insert(INSERT, ">>" + res)
 	textfield.insert(INSERT,"\n")
 	#textfield.insert(INSERT,res[2])
 	textfield.config(state="disabled")
@@ -129,7 +128,8 @@ def Quit():
 		root.quit()
 
 
-## Progam starts here
+
+## Program starts here
 root = Tk()
 root.title("Turing's Wrath")
 
@@ -174,6 +174,7 @@ quit.grid(row=3,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 # The text field in which the random passwords are shown
 textfield = Text(root, width=80, height=15, yscrollcommand = scrollbar.set, bd=3, wrap=WORD)
 textfield.grid(row=6, column=1)
+
 
 # Button to delete everything in the text field
 clrText = Button(root, text="Clear Everything", width=12, height=2, fg="white" ,bg="red", command=Clr)
