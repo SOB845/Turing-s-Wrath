@@ -12,7 +12,7 @@ except ModuleNotFoundError:
 	print("### pip install tkinter ###")
 	raise
 
-# HERE ARE THE ESSENTIAL FUNTIONS (REFERRED AS COMMANDS IN TKINTER) THAT KEEP THE PROGRAM RUNNING.
+# HERE ARE THE ESSENTIAL FUNTIONS (REFERRED TO AS COMMANDS IN TKINTER) THAT KEEP THE PROGRAM RUNNING.
 # UNLESS YOU KNOW WHAT YOU'RE DOING, PLEASE DON'T TOUCH THEM.
 
 def Generate():
@@ -23,7 +23,7 @@ def Generate():
 	while i < 2:
 		if leng <= 6:
 			messagebox.showwarning("Warning!", "For higher password security, the length should be greater than 6.")
-		elif NUMS.get()==1 and SYMBS.get()==1:
+		elif NUMS.get() == 1 and SYMBS.get() == 1:
 			textfield.insert(INSERT,">> " + xclude_digits_and_symbols(leng)+'\n')
 		elif NUMS.get() == 1:
 			textfield.insert(INSERT, ">> " + xclude_digits(leng) +'\n')
@@ -33,6 +33,7 @@ def Generate():
 			textfield.insert(INSERT,">> " + Generator(ascii_letters,digits,punctuation,leng) + '\n')
 		i += 1
 	textfield.config(state="disabled")
+
 
 def Destroy_CheckPwnageWindow():
 	checkWin.destroy()
@@ -60,10 +61,11 @@ def CheckPwnageWindow():
 
 def save_to_database():
 	#Saves service name, username and password in the database
-	#'e' standds for entry
-	e1 = Service_Saver.get() # Service name
+	#'e' stands for entry
+	e1 = Service_Saver.get().lower() #Service name to lowercase
 	e2 = Username_Saver.get() # Username
 	e3 = Password_Saver.get() # Password
+
 	if len(e1) == 0 or len(e3) == 0:
 		messagebox.showerror("Error","Service and Password fields cannot be empty!")
 	else:
@@ -71,41 +73,49 @@ def save_to_database():
 		messagebox.showinfo("Info","Password is saved!")
 		savewin.destroy()
 
-def find_password(Service_Name): #Connects to the database and looks for info for a given Service name
-    global res
-    connection = sqlite3.connect(r"C:\Users\Windows\turinginfo.db")
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM user_data WHERE service = (?)",(Service_Name,))
-    connection.commit()
-    res = str(cursor.fetchall())
-    connection.close()
 
+def find_password(Service_Name): #Connects to the database and looks for info for given Service name
+	global res
+	connection = sqlite3.connect(database_path)
+	cursor = connection.cursor()
+	cursor.execute("SELECT service,username,password,date_added FROM user_data WHERE service LIKE (?)",(f'%{Service_Name}%',))
+	connection.commit()
+	results = cursor.fetchall()
 
-def lookup_service():	#Search the database for a password
-	textfield.config(state="normal")
-	l = Search_Service_Saver.get()
-	find_password(l)
-	textfield.insert(INSERT, "\n")
-	textfield.insert(INSERT, ">>" + res)
-	textfield.insert(INSERT,"\n")
-	#textfield.insert(INSERT,res[2])
+	for row in results:
+		textfield.insert(INSERT, ">>"+"\n")
+		textfield.insert(INSERT, str(row))
+		textfield.insert(INSERT, "\n")
+
 	textfield.config(state="disabled")
+	connection.close()
+
+#Find a password in the database ###############
+def lookup_service():
+	textfield.config(state="normal")
+	sought_password = Search_Service_Saver.get().lower()
+	find_password(sought_password)
+####################################################
 
 def SaveWindow():
 	global savewin
 	savewin = Toplevel(root)
 	Label(savewin, text="Type the password and its associated service\n",font=('Ariel',12)).grid(row=0, column=1)
 	Label(savewin,text="Service/App:").grid(row=1, column=0,ipady=10)
-	Entry(savewin,width=35,bd=2, textvariable=Service_Saver).grid(row=1,column=1)
+	Entry(savewin,width=35,bd=2, textvariable = Service_Saver).grid(row=1,column=1)
+
 	Label(savewin, text="Username/Email:").grid(row=2,column=0,ipady=10)
-	Entry(savewin,width=35,bd=2, textvariable=Username_Saver).grid(row=2,column=1)
+	Entry(savewin,width=35,bd=2, textvariable = Username_Saver).grid(row=2,column=1)
+
 	Label(savewin, text="Password:").grid(row=3,column=0,ipady=10)
-	Entry(savewin,width=35,bd=2, textvariable=Password_Saver).grid(row=3,column=1)
+	Entry(savewin,width=35,bd=2, textvariable = Password_Saver).grid(row=3,column=1)
+
 	Button(savewin, text="SAVE",height=2, width=7, command=save_to_database).grid(row=4, column=1,padx=1, pady=18, ipadx=5, ipady=1)
 	savewin.title("Save password")
 	savewin.geometry("470x235")
 	savewin.iconbitmap('AlanTuring(64x64).ico')
 
+# Search Window #####################################
 def SearchWindow():
 	global searchwin
 	searchwin = Toplevel(root)
@@ -116,6 +126,7 @@ def SearchWindow():
 	searchwin.title("Search Password")
 	searchwin.geometry("300x200")
 	searchwin.iconbitmap('AlanTuring(64x64).ico')
+##################################################
 
 def Clr():
 	textfield.config(state="normal")
@@ -128,38 +139,45 @@ def Quit():
 		root.quit()
 
 
-
-## Program starts here
+## Progam starts here
 root = Tk()
 root.title("Turing's Wrath")
 
-# Scrollbar
+# Scrollbar #################################
 scrollbar = Scrollbar(root)
 scrollbar.grid(row=0, column=1,sticky='ns' )
 
 intro = Label(root, text="Turing's Wrath: The Password Generator\nMove the slider to choose desired length", font=('Times',20))
 intro.grid(row=0,column=1)
+#############################################
+
 
 #### Slider for choosing the length of random password
-sld = Scale(root, from_=1, to=100, length=600, orient=HORIZONTAL)
+sld = Scale(root, from_=1, to=69, length=600, orient=HORIZONTAL)
 sld.grid(row=5, column=1)
+#############################################
 
-### Data storage
+
+### Data storage ############################
 NUMS = BooleanVar()	#Stores Boolean data for exclude_digits checkbox
 SYMBS = BooleanVar() #Stores Boolean data for exclude_symbols checkbox
 GetTxt = StringVar() #Stores entry data for call_lookup_api function
-Service_Saver = StringVar()	#Stores entry data for SaveWindow
+Service_Saver = StringVar() #Stores entry data for SaveWindow
 Username_Saver = StringVar() #Stores entry data for SaveWindow
 Password_Saver = StringVar() #Stores entry data for SaveWindow
 Search_Service_Saver = StringVar() #Stores entry data for SearchWindow
+#############################################
 
-### Checkboxes
+
+### Checkboxes ##############################
 exclude_digits= Checkbutton(root, text="EXCLUDE NUMBERS FROM PASSWORD", variable = NUMS)
 exclude_digits.grid(row=7,column=0)
 exclude_symbols = Checkbutton(root, text="EXCLUDE SYMBOLS FROM PASSWORD", variable = SYMBS)
 exclude_symbols.grid(row=7,column=1)
+#############################################
 
-### Buttons
+
+### Buttons ################################################
 Generator_Button = Button(root, text="GENERATE PASSWORD", height=2, command=Generate)
 Generator_Button.grid(row=1,column=0,padx=20, pady=5, ipadx= 5, ipady = 2)
 CheckPwnage = Button(root, height=2, text="CHECK IF PWNED", command=CheckPwnageWindow)
@@ -170,11 +188,12 @@ OpenSearch = Button(root, text="SEARCH SERVICE", height=2, command=SearchWindow)
 OpenSearch.grid(row=2,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 quit = Button(root, text="QUIT", width=6, height=2, command=Quit)
 quit.grid(row=3,column=1,padx=20, pady=10, ipadx=5, ipady=2)
+############################################################
+
 
 # The text field in which the random passwords are shown
 textfield = Text(root, width=80, height=15, yscrollcommand = scrollbar.set, bd=3, wrap=WORD)
 textfield.grid(row=6, column=1)
-
 
 # Button to delete everything in the text field
 clrText = Button(root, text="Clear Everything", width=12, height=2, fg="white" ,bg="red", command=Clr)
