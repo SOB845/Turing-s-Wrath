@@ -69,32 +69,37 @@ def save_to_database():
 	if len(e1) == 0 or len(e3) == 0:
 		messagebox.showerror("Error","Service and Password fields cannot be empty!")
 	else:
-		save_password(e1,e2,e3)
-		messagebox.showinfo("Info","Password is saved!")
-		savewin.destroy()
+		save_or_update_password(e1, e2, e3)
+		messagebox.showinfo("Info", "Password Saved!")
+	savewin.destroy()
 
-
-def find_password(Service_Name): #Connects to the database and looks for info for given Service name
+def find_password(Service_Name, User_Name): #Connects to the database and looks for info of given Service name
 	global res
 	connection = sqlite3.connect(database_path)
 	cursor = connection.cursor()
-	cursor.execute("SELECT service,username,password,date_added FROM user_data WHERE service LIKE (?)",(f'%{Service_Name}%',))
+
+	cursor.execute('''
+	SELECT * FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL))
+	WHERE date_added = (SELECT MAX(date_added) FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL) ))
+	''', ( f'%{Service_Name}%', User_Name or None, f'%{Service_Name}%', User_Name or None))
+
 	connection.commit()
 	results = cursor.fetchall()
 
 	for row in results:
 		textfield.insert(INSERT, ">>"+"\n")
-		textfield.insert(INSERT, str(row))
+		textfield.insert(INSERT, row)
 		textfield.insert(INSERT, "\n")
 
 	textfield.config(state="disabled")
 	connection.close()
 
-#Find a password in the database ###############
+# Find a password in the database ###############
 def lookup_service():
 	textfield.config(state="normal")
-	sought_password = Search_Service_Saver.get().lower()
-	find_password(sought_password)
+	sought_service = Search_Service_Saver.get().lower()
+	sought_username = Search_Username_Saver.get()
+	find_password(sought_service, sought_username)
 ####################################################
 
 def SaveWindow():
@@ -120,11 +125,16 @@ def SearchWindow():
 	global searchwin
 	searchwin = Toplevel(root)
 	Label(searchwin, text="Type in the name of the service\n",font=('Ariel',12)).grid(row=0, column=1)
+
 	Label(searchwin,text="Service/App:").grid(row=1, column=0,ipady=10)
 	Entry(searchwin,width=35,bd=2, textvariable=Search_Service_Saver).grid(row=1,column=1)
+
+	Label(searchwin,text="Username/Email:").grid(row=2, column=0,ipady=10)
+	Entry(searchwin,width=35,bd=2, textvariable=Search_Username_Saver).grid(row=2,column=1)
+
 	Button(searchwin,text="Look Up",height=2, width=7, command=lookup_service).grid(row=3, column=1,padx=1, pady=18, ipadx=5, ipady=1)
 	searchwin.title("Search Password")
-	searchwin.geometry("300x200")
+	searchwin.geometry("400x250")
 	searchwin.iconbitmap('AlanTuring(64x64).ico')
 ##################################################
 
@@ -166,6 +176,7 @@ Service_Saver = StringVar() #Stores entry data for SaveWindow
 Username_Saver = StringVar() #Stores entry data for SaveWindow
 Password_Saver = StringVar() #Stores entry data for SaveWindow
 Search_Service_Saver = StringVar() #Stores entry data for SearchWindow
+Search_Username_Saver = StringVar() #Stores entry data for SearchWindow
 #############################################
 
 
