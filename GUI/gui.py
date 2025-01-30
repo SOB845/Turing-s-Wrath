@@ -70,18 +70,25 @@ def save_to_database():
 		messagebox.showerror("Error","Service and Password fields cannot be empty!")
 	else:
 		save_or_update_password(e1, e2, e3)
+		savewin.destroy()
 		messagebox.showinfo("Info", "Password Saved!")
-	savewin.destroy()
 
 def find_password(Service_Name, User_Name): #Connects to the database and looks for info of given Service name
 	global res
 	connection = sqlite3.connect(database_path)
 	cursor = connection.cursor()
 
-	cursor.execute('''
-	SELECT * FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL))
-	WHERE date_added = (SELECT MAX(date_added) FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL) ))
-	''', ( f'%{Service_Name}%', User_Name or None, f'%{Service_Name}%', User_Name or None))
+	# If no username was passed, it doesn't bother.
+	# Otherwise returns the entry with the expected username/email
+	if User_Name =='':
+		cursor.execute(''' SELECT * FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ?) WHERE date_added = (SELECT MAX(date_added)
+		FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ?) )
+		''',  (f'%{Service_Name}%', f'%{Service_Name}%') )
+	else:
+		cursor.execute('''
+		SELECT * FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL OR username = ''))
+		WHERE date_added = (SELECT MAX(date_added) FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ? AND (username = ? OR username IS NULL OR username = '') ))
+		''', ( f'%{Service_Name}%', User_Name or None, f'%{Service_Name}%', User_Name or None))
 
 	connection.commit()
 	results = cursor.fetchall()
@@ -102,6 +109,10 @@ def lookup_service():
 	find_password(sought_service, sought_username)
 ####################################################
 
+
+	########## WINDOWS #############
+
+# SAVE WINDOW ###############################
 def SaveWindow():
 	global savewin
 	savewin = Toplevel(root)
@@ -119,6 +130,7 @@ def SaveWindow():
 	savewin.title("Save password")
 	savewin.geometry("470x235")
 	savewin.iconbitmap('AlanTuring(64x64).ico')
+#################################################
 
 # Search Window #####################################
 def SearchWindow():
