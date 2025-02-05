@@ -228,7 +228,7 @@ textfield.grid(row=6, column=1)
 clrText = Button(root, text="Clear Everything", width=12, height=2, fg="white" ,bg="red", command=Clr)
 clrText.grid(row=3,column=0,padx= 20, pady=10, ipadx=5, ipady=2)
 
-#root.iconbitmap('AlanTuring(64x64).ico')
+root.iconbitmap('AlanTuring(64x64).ico') # This icon may cause issues on Linux (Remind me to FIX later)
 root.geometry("1080x720")
 root.eval('tk::PlaceWindow . center')	# Centers the app window (NOT SO ACCURATELY)
 root.mainloop()	# Keeps program running
