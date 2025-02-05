@@ -72,6 +72,7 @@ def save_to_database():
 		save_or_update_password(e1, e2, e3)
 		savewin.destroy()
 		messagebox.showinfo("Info", "Password Saved!")
+	#savewin.destroy()
 
 def find_password(Service_Name, User_Name): #Connects to the database and looks for info of given Service name
 	global res
@@ -79,7 +80,7 @@ def find_password(Service_Name, User_Name): #Connects to the database and looks 
 	cursor = connection.cursor()
 
 	# If no username was passed, it doesn't bother.
-	# Otherwise returns the entry with the expected username/email
+	# Otherwise returns the entry with expected username/email
 	if User_Name =='':
 		cursor.execute(''' SELECT * FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ?) WHERE date_added = (SELECT MAX(date_added)
 		FROM (SELECT service,username,password,date_added FROM user_data WHERE service LIKE ?) )
@@ -201,14 +202,19 @@ exclude_symbols.grid(row=7,column=1)
 
 
 ### Buttons ################################################
-Generator_Button = Button(root, text="GENERATE PASSWORD", height=2, command=Generate)
+
+Generator_Button = Button(root, text="GENERATE PASSWORD", height=2, bd = 8, command=Generate)
 Generator_Button.grid(row=1,column=0,padx=20, pady=5, ipadx= 5, ipady = 2)
+
 CheckPwnage = Button(root, height=2, text="CHECK IF PWNED", command=CheckPwnageWindow)
 CheckPwnage.grid(row=2,column=0,padx=20, pady=10, ipadx=5, ipady=2)
+
 Save = Button(root, text="SAVE PASSWORD", height=2, command=SaveWindow)
 Save.grid(row=1,column=1,padx=20, pady=10, ipadx=5, ipady=2)
+
 OpenSearch = Button(root, text="SEARCH SERVICE", height=2, command=SearchWindow)
 OpenSearch.grid(row=2,column=1,padx=20, pady=10, ipadx=5, ipady=2)
+
 quit = Button(root, text="QUIT", width=6, height=2, command=Quit)
 quit.grid(row=3,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 ############################################################
@@ -222,7 +228,7 @@ textfield.grid(row=6, column=1)
 clrText = Button(root, text="Clear Everything", width=12, height=2, fg="white" ,bg="red", command=Clr)
 clrText.grid(row=3,column=0,padx= 20, pady=10, ipadx=5, ipady=2)
 
-root.iconbitmap('AlanTuring(64x64).ico')
+#root.iconbitmap('AlanTuring(64x64).ico')
 root.geometry("1080x720")
 root.eval('tk::PlaceWindow . center')	# Centers the app window (NOT SO ACCURATELY)
 root.mainloop()	# Keeps program running
