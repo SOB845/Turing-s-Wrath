@@ -6,6 +6,7 @@ import os
 global path
 current_path = os.getcwd()
 database_path = current_path + "\\userinfo.db"
+mainpass_loc = current_path + "\\mainpass.db"
 
 def create_connection():
     global conn
@@ -32,5 +33,17 @@ def save_or_update_password(input_service,input_name,input_password):
 
     cursor.execute("INSERT INTO user_data (service, username, password, date_added) VALUES (?,?,?,?)", (input_service,input_name or None,input_password,current_time))
 
+    conn.commit()
+    conn.close()
+
+def create_mainpass_database(MainPass, Recovery_Word):
+    global mainpass_loc
+    global conn
+    global cursor
+
+    conn = sqlite3.connect(mainpass_loc)
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS main_password (id INTEGER PRIMARY KEY AUTOINCREMENT, Pass text NOT NULL, Recovery text NOT NULL)")
+    cursor.execute("INSERT INTO main_password (Pass,Recovery) VALUES (?,?)", (MainPass, Recovery_Word))
     conn.commit()
     conn.close()
