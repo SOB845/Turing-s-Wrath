@@ -1,10 +1,15 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
+from tkinter import simpledialog
 from pwned import lookup_pwned_api
 from randpass_generator import *
 from string import ascii_letters, digits, punctuation
 from Database import *
+import os
+import hashlib
+import hmac
+
 
 try:
 	from tkinter import *
@@ -14,6 +19,41 @@ except ModuleNotFoundError:
 
 # HERE ARE THE ESSENTIAL FUNTIONS (REFERRED TO AS COMMANDS IN TKINTER) THAT KEEP THE PROGRAM RUNNING.
 # UNLESS YOU KNOW WHAT YOU'RE DOING, PLEASE DON'T TOUCH THEM.
+
+def ask_for_mainpass():
+	global actual_password
+
+	if not os.path.exists(mainpass_loc):
+		pw = str(simpledialog.askstring("Set Password","Create a new Password",show="*"))
+		recover = str(simpledialog.askstring("Recovery Word", "Where were you born?"))
+
+		hashed_pw = hashlib.sha256(pw.encode('utf-8')).hexdigest()
+		hashed_recover = hashlib.sha256(recover.encode('utf-8')).hexdigest()
+
+		if not (pw or recover):
+			sys.exit("Canceled")
+
+		create_mainpass_database(hashed_pw,hashed_recover)
+		messagebox.showinfo("Registered")
+
+	else:
+		input_pw = str(simpledialog.askstring("Login","Enter your Primary Password:",show="*"))
+		hashed_input_pw = hashlib.sha256(input_pw.encode('utf-8')).hexdigest()
+
+		if not input_pw:
+			sys.exit("Canceled")
+		connection = sqlite3.connect(mainpass_loc)
+		cursor = connection.cursor()
+
+		# Retreieve the current password saved in the Database and hash it
+		actual_password = cursor.execute(''' SELECT Pass FROM main_password WHERE id = (SELECT MAX(id) FROM (SELECT id FROM main_password))''')
+		actual_password = cursor.fetchone()[0] # Returns the query as a pure string instead of a tuple
+
+		if hmac.compare_digest(str(actual_password), str(hashed_input_pw)):
+			messagebox.showinfo("Correct","Entry Success!")
+		elif not hmac.compare_digest(str(actual_password), str(hashed_input_pw)):
+			messagebox.showerror("Unauthorized Access", "Wrong Password! Try Again.")
+			sys.exit()
 
 def Generate():
 	## Gets the value from slider and generates a password of that length.
@@ -72,7 +112,6 @@ def save_to_database():
 		save_or_update_password(e1, e2, e3)
 		savewin.destroy()
 		messagebox.showinfo("Info", "Password Saved!")
-	#savewin.destroy()
 
 def find_password(Service_Name, User_Name): #Connects to the database and looks for info of given Service name
 	global res
@@ -110,14 +149,41 @@ def lookup_service():
 	find_password(sought_service, sought_username)
 ####################################################
 
+# Check user athenticity and update main password
+def ConfirmChangePassword():
+	Current = currentPass.get()
+	Repeat_Current = ConfirmCurrentPass.get()
+	New = NewPass.get()
 
-	########## WINDOWS #############
+	hashed_Current = hashlib.sha256(Current.encode('utf-8')).hexdigest()
+	hashed_Repeat_Current = hashlib.sha256(Repeat_Current.encode('utf-8')).hexdigest()
+	hashed_new = hashlib.sha256(New.encode('utf-8')).hexdigest()
+
+	if not (Current or Repeat_Current or New):
+		messagebox.showerror("Empty", "No textfields must be empty!")
+	else:
+		if not (hmac.compare_digest(str(hashed_Current), str(hashed_Repeat_Current)) and hmac.compare_digest(str(hashed_Current),actual_password) and
+		hmac.compare_digest(str(hashed_Repeat_Current),actual_password)):
+			messagebox.showerror("Error", "Two or more entries did no match!")
+			updatewin.destroy()
+		else:
+			connection = sqlite3.connect(mainpass_loc)
+			cursor = connection.cursor()
+
+			Actual_Recovery = cursor.execute(''' SELECT Recovery FROM main_password WHERE id = (SELECT MAX(id) FROM (SELECT id FROM main_password))''')
+			Actual_Recovery = cursor.fetchone()[0] # Returns the query as a pure string instead of a tuple
+
+			create_mainpass_database(hashed_new, Actual_Recovery)
+			messagebox.showinfo("Confirmed","Password Reset Successful!")
+			updatewin.destroy()
+		
+########## WINDOWS #############
 
 # SAVE WINDOW ###############################
 def SaveWindow():
 	global savewin
 	savewin = Toplevel(root)
-	Label(savewin, text="Type the password and its associated service\n",font=('Ariel',12)).grid(row=0, column=1)
+	Label(savewin, text="Type in the password and its associated service\n",font=('Ariel',12)).grid(row=0, column=1)
 	Label(savewin,text="Service/App:").grid(row=1, column=0,ipady=10)
 	Entry(savewin,width=35,bd=2, textvariable = Service_Saver).grid(row=1,column=1)
 
@@ -151,6 +217,28 @@ def SearchWindow():
 	searchwin.iconbitmap('AlanTuring(64x64).ico')
 ##################################################
 
+# Update Main Password Window ####################
+def UpdatePassWindow():
+	global updatewin
+	updatewin = Toplevel(root)
+	Label(updatewin, text="To Update the main password please enter the current one\n",font=('Ariel',12)).grid(row=0, column=1)
+
+	Label(updatewin,text="Current Password:").grid(row=1, column=0,ipady=10)
+	Entry(updatewin,width=35,bd=2, textvariable=currentPass).grid(row=1,column=1)
+
+	Label(updatewin,text="Repeat Current Password:").grid(row=2, column=0,ipady=10)
+	Entry(updatewin,width=35,bd=2, textvariable=ConfirmCurrentPass).grid(row=2,column=1)
+
+	Label(updatewin,text="New Password:").grid(row=3, column=0,ipady=10)
+	Entry(updatewin,width=35,bd=2, textvariable=NewPass).grid(row=3,column=1)
+
+	Button(updatewin,text="Confirm Update",height=2, width=7, command= ConfirmChangePassword).grid(row=4, column=1,padx=1, pady=20, ipadx=5, ipady=3)
+
+	updatewin.title("Search Password")
+	updatewin.geometry("550x300")
+	updatewin.iconbitmap('AlanTuring(64x64).ico')
+#################################################
+
 def Clr():
 	textfield.config(state="normal")
 	textfield.delete(1.0,END)
@@ -162,9 +250,14 @@ def Quit():
 		root.quit()
 
 
-## Progam starts here
+### PROGRAM BEGINS FROM HERE ###############################################################################################
 root = Tk()
 root.title("Turing's Wrath")
+root.withdraw()
+
+ask_for_mainpass()
+
+root.deiconify()
 
 # Scrollbar #################################
 scrollbar = Scrollbar(root)
@@ -181,7 +274,7 @@ sld.grid(row=5, column=1)
 #############################################
 
 
-### Data storage ############################
+### Text Variable storage ############################
 NUMS = BooleanVar()	#Stores Boolean data for exclude_digits checkbox
 SYMBS = BooleanVar() #Stores Boolean data for exclude_symbols checkbox
 GetTxt = StringVar() #Stores entry data for call_lookup_api function
@@ -190,6 +283,9 @@ Username_Saver = StringVar() #Stores entry data for SaveWindow
 Password_Saver = StringVar() #Stores entry data for SaveWindow
 Search_Service_Saver = StringVar() #Stores entry data for SearchWindow
 Search_Username_Saver = StringVar() #Stores entry data for SearchWindow
+currentPass = StringVar()	# Currently set Password
+ConfirmCurrentPass = StringVar()
+NewPass = StringVar()
 #############################################
 
 
@@ -215,8 +311,11 @@ Save.grid(row=1,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 OpenSearch = Button(root, text="SEARCH SERVICE", height=2, command=SearchWindow)
 OpenSearch.grid(row=2,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 
+UpdatePasswordButton = Button(root, height=2, text="Update Password", command= UpdatePassWindow)
+UpdatePasswordButton.grid(row=3,column=1,padx=20, pady=10, ipadx=5, ipady=2)
+
 quit = Button(root, text="QUIT", width=6, height=2, command=Quit)
-quit.grid(row=3,column=1,padx=20, pady=10, ipadx=5, ipady=2)
+quit.grid(row=4,column=1,padx=20, pady=10, ipadx=5, ipady=2)
 ############################################################
 
 
@@ -228,7 +327,7 @@ textfield.grid(row=6, column=1)
 clrText = Button(root, text="Clear Everything", width=12, height=2, fg="white" ,bg="red", command=Clr)
 clrText.grid(row=3,column=0,padx= 20, pady=10, ipadx=5, ipady=2)
 
-root.iconbitmap('AlanTuring(64x64).ico') # This icon may cause issues on Linux (Remind me to FIX later)
+root.iconbitmap('AlanTuring(64x64).ico')
 root.geometry("1080x720")
 root.eval('tk::PlaceWindow . center')	# Centers the app window (NOT SO ACCURATELY)
 root.mainloop()	# Keeps program running
